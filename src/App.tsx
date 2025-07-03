@@ -24,14 +24,39 @@ function App() {
 
   // 處理輸入
   const handleInput = (row: number, col: number, value: string) => {
+    console.log(value)
     let num = 0
     if (value !== '') {
       // 支援全型數字轉換
-      const fullWidthToHalf = value.replace(/[０-９]/g, (char) => {
+      const fullWidthToHalf = value.trim().replace(/[０-９]/g, (char) => {
         return String.fromCharCode(char.charCodeAt(0) - 0xFEE0)
       })
       
-      num = parseInt(fullWidthToHalf)
+      // 取得舊值
+      const oldValue = board[row][col]
+      
+      // 判斷新輸入的數字
+      if (fullWidthToHalf.length === 1) {
+        // 如果只有一個字元，直接使用
+        num = parseInt(fullWidthToHalf)
+      } else if (fullWidthToHalf.length === 2) {
+        // 如果有兩個字元，比較哪個是新輸入的
+        const first = parseInt(fullWidthToHalf[0])
+        const second = parseInt(fullWidthToHalf[1])
+        
+        if (first === oldValue) {
+          num = second // 第一個是舊值，第二個是新值
+        } else if (second === oldValue) {
+          num = first // 第二個是舊值，第一個是新值
+        } else {
+          // 如果都不等於舊值，使用最後一個字元
+          num = second
+        }
+      } else {
+        // 其他情況使用最後一個字元
+        num = parseInt(fullWidthToHalf.slice(-1))
+      }
+      
       if (isNaN(num) || num < 0 || num > 9) return // 非法輸入不處理
     }
     const newBoard = board.map((r, i) =>
@@ -407,12 +432,12 @@ function App() {
               <div className="modal-title">使用說明</div>
               <div className="modal-help-content">
                 <ol style={{textAlign: 'left', margin: 0, paddingLeft: '1.2em'}}>
-                  <li>在 9x9 數獨格子中輸入題目（可用鍵盤或貼上）。</li>
+                  <li>在 9x9 數獨格子中輸入題目。</li>
                   <li>可點擊「貼上題目」快速貼入剪貼簿內容。</li>
                   <li>在任意格子按 Ctrl+V (Windows) 或 Cmd+V (Mac) 可從該格子開始貼上數字。</li>
                   <li>輸入完畢後，點擊「解答」即可獲得答案。</li>
                   <li>點擊「複製題目」可將目前題目複製到剪貼簿。</li>
-                  <li>點擊「新一局」可清空所有內容（會再次確認）。</li>
+                  <li>點擊「新一局」可清空所有內容。</li>
                   <li>解答模式下可點選下方數字高亮顯示。</li>
                 </ol>
               </div>
@@ -497,7 +522,7 @@ function App() {
                     ref={el => { inputRefs.current[i][j] = el; return undefined }}
                     type="text"
                     inputMode="numeric"
-                    maxLength={1}
+                    maxLength={2}
                     value={showValue === 0 ? '' : String(showValue)}
                     onChange={e => handleInput(i, j, e.target.value)}
                     onKeyDown={e => handleKeyDown(i, j, e)}
@@ -542,7 +567,7 @@ function App() {
               className="arrow-button"
               onClick={() => handleArrowClick('left')}
             >
-              ⬅️
+              ←
             </button>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
               <button
@@ -557,7 +582,7 @@ function App() {
               className="arrow-button"
               onClick={() => handleArrowClick('right')}
             >
-              ➡️
+              →
             </button>
           </div>
         )}

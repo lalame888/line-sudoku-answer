@@ -20,9 +20,8 @@ body {
   margin: 0 auto;
   padding: 1rem 2rem 0.5rem 2rem;
   text-align: center;
-  flex-direction: column
-
-
+  flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* 主容器 */
@@ -38,9 +37,11 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   max-width: 600px;
+  width: 100%;
   margin: 0 auto;
   min-height: 70vh;
   height: auto;
+  box-sizing: border-box;
 }
 
 /* 標題區域 */
@@ -101,9 +102,11 @@ body {
 /* 按鈕群組 */
 .button-group {
   display: flex;
+  flex-direction: row !important;
   gap: 1rem;
   justify-content: center;
   margin-bottom: 1.5rem;
+  flex-wrap: nowrap !important;
 }
 
 .action-button {
@@ -115,11 +118,14 @@ body {
   font-weight: 600;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 
 .paste-button {
   background: linear-gradient(45deg, #667eea, #764ba2);
   color: white;
+  white-space: nowrap;
 }
 
 .paste-button:hover {
@@ -130,6 +136,7 @@ body {
 .copy-button {
   background: linear-gradient(45deg, #4ecdc4, #44a08d);
   color: white;
+  white-space: nowrap;
 }
 
 .copy-button:hover {
@@ -140,19 +147,21 @@ body {
 /* 數獨網格 */
 .sudoku-grid {
   display: grid;
-  grid-template-columns: repeat(9, 40px);
-  gap: 0;
-  background: #333;
-  padding: 3px;
-  border-radius: 10px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  width: 100%;
+  gap: 1px;
+  padding: 2px;
+  box-sizing: border-box;
 }
 
 .sudoku-cell {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  aspect-ratio: 1/1;
+  min-width: 0;
+  min-height: 0;
+  font-size: clamp(0.9rem, 4vw, 2.2rem);
+  box-sizing: border-box;
   text-align: center;
-  font-size: 1.2rem;
   font-weight: 600;
   border: 1px solid transparent;
   outline: none;
@@ -160,6 +169,7 @@ body {
   color: #333;
   transition: all 0.2s ease;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .sudoku-cell:focus {
@@ -205,7 +215,10 @@ body {
 
 .main-buttons {
   display: flex;
+  flex-direction: row !important;
   gap: 1.5rem;
+  flex-wrap: nowrap !important;
+  align-items: center;
 }
 
 .solve-button, .new-game-button {
@@ -217,6 +230,8 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 
 .solve-button {
@@ -281,61 +296,63 @@ body {
 
 /* 數字選擇器 */
 .number-selector {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 0.1em;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 1.5rem;
+  padding: 0;
+  background: transparent;
+  align-items: center;
+}
+
+.number-button, .arrow-button {
+  width: 100%;
+  aspect-ratio: 1/1;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
   display: flex;
-  gap: 0.5rem;
   align-items: center;
   justify-content: center;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.arrow-button {
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
   border-radius: 50%;
-  transition: all 0.2s ease;
-}
-
-.arrow-button:hover {
-  background: #f0f0f0;
-  transform: scale(1.1);
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  box-sizing: border-box;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .number-button {
-  width: 45px;
-  height: 45px;
-  font-size: 1.1rem;
   font-weight: 600;
-  border: 3px solid #e0e0e0;
-  border-radius: 50%;
-  background: white;
   color: #333;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+  background: white;
+  border: 3px solid #e0e0e0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease, box-shadow 0.2s;
 }
 
 .number-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   border-color: #e74c3c;
+  box-shadow: 0 0 0 3px #ffeaea, 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 1;
 }
 
 .number-button.selected {
+  border-color: #e74c3c;
   background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-  color: white;
-  border-color: #ff6b6b;
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  color: #fff;
+  box-shadow: 0 0 0 3px #ffeaea, 0 6px 20px rgba(255, 107, 107, 0.4);
+  z-index: 2;
+}
+
+.arrow-button:focus,
+.arrow-button:active,
+.arrow-button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* 動畫效果 */
@@ -394,9 +411,14 @@ body {
   }
   
   .number-button {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    width: calc((100% - 2rem) / 9);
+    max-width: 40px;
+    min-width: 28px;
+    height: calc((100% - 2rem) / 9);
+    max-height: 40px;
+    min-height: 28px;
+    aspect-ratio: 1;
+    font-size: clamp(0.8rem, 2.2vw, 1rem);
   }
   
   .button-group {
@@ -407,6 +429,147 @@ body {
   .main-buttons {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+/* 手機版面優化 */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.8rem;
+    margin: 0.5rem;
+    max-width: 100%;
+  }
+  
+  .main-title {
+    font-size: 1.8rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .game-container {
+    padding: 1.5rem;
+  }
+  
+  .sudoku-grid {
+    width: 100%;
+    max-width: 100vw;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+    padding: 2px;
+  }
+  
+  .sudoku-cell {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    min-height: 0;
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    box-sizing: border-box;
+  }
+  
+  /* 數字選擇器手機版面優化 */
+  .number-selector {
+    flex-wrap: wrap;
+    gap: clamp(0.2rem, 1vw, 0.3rem);
+    padding: clamp(0.6rem, 2vw, 0.8rem);
+    max-width: 100%;
+    justify-content: center;
+    align-items: center
+  }
+  
+  .number-button {
+    width: calc((100% - 1.6rem) / 11);
+    max-width: 35px;
+    min-width: 25px;
+    height: calc((100% - 1.6rem) / 11);
+    max-height: 35px;
+    min-height: 25px;
+    aspect-ratio: 1;
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    border-width: 2px;
+  }
+  
+  .arrow-button {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    padding: clamp(0.3rem, 1vw, 0.4rem);
+  }
+  
+  .button-group {
+    gap: 0.8rem;
+  }
+  
+  .action-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+  
+  .solve-button, .new-game-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 超小螢幕優化 */
+@media (max-width: 360px) {
+  .app-container {
+    padding: 0.5rem;
+    margin: 0.3rem;
+  }
+  
+  .main-title {
+    font-size: 1.6rem;
+  }
+  
+  .subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .game-container {
+    padding: 0.5rem;
+  }
+  
+  .sudoku-grid {
+    grid-template-columns: repeat(9, 28px);
+  }
+  
+  .sudoku-cell {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .number-selector {
+    gap: clamp(0.1rem, 0.8vw, 0.2rem);
+    padding: clamp(0.4rem, 1.5vw, 0.6rem);
+  }
+  
+  .number-button {
+    width: calc((100% - 1.2rem) / 9);
+    max-width: 30px;
+    min-width: 22px;
+    height: calc((100% - 1.2rem) / 9);
+    max-height: 30px;
+    min-height: 22px;
+    aspect-ratio: 1;
+    font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+    border-width: 1px;
+  }
+  
+  .arrow-button {
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    padding: clamp(0.2rem, 0.8vw, 0.3rem);
+  }
+  
+  .action-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .solve-button, .new-game-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.85rem;
   }
 }
 
@@ -688,4 +851,8 @@ button:focus-visible {
 
 .github-icon {
   font-size: 0.8rem;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }

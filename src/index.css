@@ -55,13 +55,11 @@ button {
   transition: all 0.25s ease;
 }
 button:hover {
-  border-color: #667eea;
   transform: translateY(-1px);
 }
 button:focus,
 button:focus-visible {
-  outline: 2px solid #667eea;
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* 移除深色主題相關設定，保持亮色主題 */
