@@ -15,6 +15,12 @@ function App() {
   const [solution, setSolution] = useState<number[][] | null>(null)
   // 儲存選中的數字
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null)
+  // 新增：Modal顯示狀態
+  const [showModal, setShowModal] = useState(false)
+  // 新增：訊息Modal狀態
+  const [messageModal, setMessageModal] = useState<{ open: boolean, message: string, content?: string }>({ open: false, message: '' })
+  // 新增：說明Modal狀態
+  const [helpModal, setHelpModal] = useState(false)
 
   // 處理輸入
   const handleInput = (row: number, col: number, value: string) => {
@@ -74,6 +80,151 @@ function App() {
         inputRefs.current[row - 1][GRID_SIZE - 1]?.focus()
       }
     }
+
+    // 處理貼上功能 (Ctrl+V 或 Cmd+V)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+      e.preventDefault()
+      handlePasteFromCell(row, col)
+    }
+  }
+
+  // 從指定格子開始貼上剪貼簿內容
+  const handlePasteFromCell = async (startRow: number, startCol: number) => {
+    try {
+      const text = await navigator.clipboard.readText()
+      const digits = text.replace(/[^0-9]/g, '') // 只保留數字
+      
+      if (digits.length === 0) {
+        showMessage('剪貼簿中沒有找到數字')
+        return
+      }
+
+      const newBoard = board.map(row => [...row])
+      let currentRow = startRow
+      let currentCol = startCol
+      let pastedCount = 0
+
+      for (const digit of digits) {
+        const num = parseInt(digit)
+        if (num >= 0 && num <= 9) {
+          newBoard[currentRow][currentCol] = num
+          pastedCount++
+          
+          // 移到下一個格子
+          if (currentCol < GRID_SIZE - 1) {
+            currentCol++
+          } else if (currentRow < GRID_SIZE - 1) {
+            currentRow++
+            currentCol = 0
+          } else {
+            // 已經填滿整個格子，停止貼上
+            break
+          }
+        }
+      }
+
+      setBoard(newBoard)
+      setSolution(null) // 清除之前的解答
+      setSelectedNumber(null) // 清除選中的數字
+      
+      if (pastedCount === 0) {
+        showMessage('沒有有效的數字可以貼上')
+      }
+    } catch (err) {
+      console.error('貼上失敗:', err)
+      showMessage('貼上失敗，請檢查剪貼簿內容')
+    }
+  }
+
+  // 檢查數獨題目是否合法並返回錯誤訊息
+  function getSudokuValidationError(board: number[][]): string | null {
+    // 檢查行
+    for (let row = 0; row < 9; row++) {
+      const seen = new Set<number>()
+      for (let col = 0; col < 9; col++) {
+        const num = board[row][col]
+        if (num !== 0) {
+          if (seen.has(num)) {
+            return `第 ${row + 1} 行有重複的數字 ${num}`
+          }
+          seen.add(num)
+        }
+      }
+    }
+
+    // 檢查列
+    for (let col = 0; col < 9; col++) {
+      const seen = new Set<number>()
+      for (let row = 0; row < 9; row++) {
+        const num = board[row][col]
+        if (num !== 0) {
+          if (seen.has(num)) {
+            return `第 ${col + 1} 列有重複的數字 ${num}`
+          }
+          seen.add(num)
+        }
+      }
+    }
+
+    // 檢查 3x3 宮格
+    for (let box = 0; box < 9; box++) {
+      const seen = new Set<number>()
+      const startRow = Math.floor(box / 3) * 3
+      const startCol = (box % 3) * 3
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          const num = board[startRow + i][startCol + j]
+          if (num !== 0) {
+            if (seen.has(num)) {
+              const boxRow = Math.floor(box / 3) + 1
+              const boxCol = (box % 3) + 1
+              return `第 ${boxRow} 行第 ${boxCol} 個宮格有重複的數字 ${num}`
+            }
+            seen.add(num)
+          }
+        }
+      }
+    }
+
+    return null
+  }
+
+  // 檢查數獨題目是否合法
+  function isValidSudoku(board: number[][]): boolean {
+    return getSudokuValidationError(board) === null
+  }
+
+  // 檢查特定格子是否合法
+  function isCellValid(board: number[][], row: number, col: number): boolean {
+    const num = board[row][col]
+    if (num === 0) return true
+
+    // 檢查同一行
+    for (let c = 0; c < 9; c++) {
+      if (c !== col && board[row][c] === num) {
+        return false
+      }
+    }
+
+    // 檢查同一列
+    for (let r = 0; r < 9; r++) {
+      if (r !== row && board[r][col] === num) {
+        return false
+      }
+    }
+
+    // 檢查同一宮格
+    const startRow = Math.floor(row / 3) * 3
+    const startCol = Math.floor(col / 3) * 3
+    for (let r = startRow; r < startRow + 3; r++) {
+      for (let c = startCol; c < startCol + 3; c++) {
+        if ((r !== row || c !== col) && board[r][c] === num) {
+          return false
+        }
+      }
+    }
+
+    return true
   }
 
   // 數獨解答演算法
@@ -117,6 +268,11 @@ function App() {
   // 處理「解答」按鈕
   const handleSolve = () => {
     const ans = solveSudoku(board)
+    if (ans === null) {
+      showMessage('此題目無解！', '請檢查題目是否正確')
+      return
+    }
+    
     setSolution(ans)
     setSelectedNumber(null) // 重置選中的數字
   }
@@ -139,25 +295,39 @@ function App() {
     }
   }
 
-  // 新一局功能
+  // 新一局功能（只顯示Modal，不直接清空）
   const handleNewGame = () => {
+    setShowModal(true)
+  }
+
+  // 真正執行清空
+  const confirmNewGame = () => {
     setBoard(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0)))
     setSolution(null)
     setSelectedNumber(null)
+    setShowModal(false)
   }
+
+  // 取消清空
+  const cancelNewGame = () => {
+    setShowModal(false)
+  }
+
+  // 顯示訊息Modal
+  const showMessage = (msg: string, content?: string) => setMessageModal({ open: true, message: msg, content })
+  const closeMessage = () => setMessageModal({ open: false, message: '', content: undefined })
 
   // 複製題目到剪貼簿
   const handleCopy = async () => {
     const puzzleText = board.map(row => 
       row.map(cell => cell).join('')
     ).join('\n')
-    
     try {
       await navigator.clipboard.writeText(puzzleText)
-      alert('題目已複製到剪貼簿！')
+      showMessage('題目已複製到剪貼簿！', puzzleText)
     } catch (err) {
       console.error('複製失敗:', err)
-      alert('複製失敗，請手動複製')
+      showMessage('複製失敗，請手動複製')
     }
   }
 
@@ -166,20 +336,17 @@ function App() {
     try {
       const text = await navigator.clipboard.readText()
       const lines = text.trim().split('\n')
-      
       if (lines.length !== 9) {
-        alert('請貼上 9 行的數獨題目')
+        showMessage('請貼上 9 行的數獨題目')
         return
       }
-      
       const newBoard: number[][] = []
       for (let i = 0; i < 9; i++) {
         const line = lines[i].trim()
         if (line.length !== 9) {
-          alert(`第 ${i + 1} 行長度不正確，應為 9 個數字`)
+          showMessage(`第 ${i + 1} 行長度不正確，應為 9 個數字`)
           return
         }
-        
         const row: number[] = []
         for (let j = 0; j < 9; j++) {
           const char = line[j]
@@ -188,7 +355,7 @@ function App() {
           } else {
             const num = parseInt(char)
             if (isNaN(num) || num < 1 || num > 9) {
-              alert(`第 ${i + 1} 行第 ${j + 1} 個字元不是有效數字`)
+              showMessage(`第 ${i + 1} 行第 ${j + 1} 個字元不是有效數字`)
               return
             }
             row.push(num)
@@ -196,14 +363,13 @@ function App() {
         }
         newBoard.push(row)
       }
-      
       setBoard(newBoard)
       setSolution(null) // 清除之前的解答
       setSelectedNumber(null) // 清除選中的數字
-      alert('題目已貼上！')
+      showMessage('題目已貼上！')
     } catch (err) {
       console.error('貼上失敗:', err)
-      alert('貼上失敗，請檢查剪貼簿內容')
+      showMessage('貼上失敗，請檢查剪貼簿內容')
     }
   }
 
@@ -228,45 +394,102 @@ function App() {
     return () => document.removeEventListener('keydown', handleGlobalKeyDown)
   }, [solution, selectedNumber])
 
+  // 判斷題目是否全空
+  const isBoardEmpty = board.every(row => row.every(cell => cell === 0))
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 32 }}>
-      <div style={{ position: 'relative' }}>
-        <div style={{ position: 'absolute', top: -40, right: 0, display: 'flex', gap: 8 }}>
-          <button
-            onClick={handlePaste}
-            style={{
-              padding: '8px 16px',
-              fontSize: 14,
-              backgroundColor: '#2196F3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            貼上題目
+    <div className="app-container">
+      {/* 使用說明 Modal */}
+      {helpModal && (
+        <div className="modal-backdrop" onClick={() => setHelpModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">使用說明</div>
+            <div className="modal-help-content">
+              <ol style={{textAlign: 'left', margin: 0, paddingLeft: '1.2em'}}>
+                <li>在 9x9 數獨格子中輸入題目（可用鍵盤或貼上）。</li>
+                <li>可點擊「貼上題目」快速貼入剪貼簿內容。</li>
+                <li>在任意格子按 Ctrl+V (Windows) 或 Cmd+V (Mac) 可從該格子開始貼上數字。</li>
+                <li>輸入完畢後，點擊「解答」即可獲得答案。</li>
+                <li>點擊「複製題目」可將目前題目複製到剪貼簿。</li>
+                <li>點擊「新一局」可清空所有內容（會再次確認）。</li>
+                <li>解答模式下可點選下方數字高亮顯示。</li>
+              </ol>
+            </div>
+            <div className="modal-actions">
+              <button className="modal-confirm" onClick={() => setHelpModal(false)}>關閉</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* 訊息 Modal */}
+      {messageModal.open && (
+        <div className="modal-backdrop" onClick={closeMessage}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">{messageModal.message}</div>
+            {messageModal.content && (
+              <pre className="modal-pre">{messageModal.content}</pre>
+            )}
+            <div className="modal-actions">
+              <button className="modal-confirm" onClick={closeMessage}>關閉</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal 視窗 */}
+      {showModal && (
+        <div className="modal-backdrop" onClick={cancelNewGame}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">確定要清空所有題目內容嗎？</div>
+            <div className="modal-actions">
+              <button className="modal-cancel" onClick={cancelNewGame}>取消</button>
+              <button className="modal-confirm" onClick={confirmNewGame}>確認</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* 標題區域 */}
+      <div className="title-section">
+        <h1 className="main-title">
+          <span className="title-icon">🧩</span>
+          數獨解答神器
+          <span className="title-icon">✨</span>
+        </h1>
+        <div className="subtitle-row">
+          <p className="subtitle">輸入數獨題目，一鍵獲得解答！</p>
+          <div className="help-btn-inline-wrapper">
+            <button className="help-btn-inline" onClick={() => setHelpModal(true)} aria-label="使用說明">
+              ⓘ
+              <span className="help-tooltip">使用說明</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 主要遊戲區域 */}
+      <div className="game-container">
+        <div className="button-group">
+          <button className="action-button paste-button" onClick={handlePaste}>
+            📋 貼上題目
           </button>
-          <button
-            onClick={handleCopy}
-            style={{
-              padding: '8px 16px',
-              fontSize: 14,
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            複製題目
+          <button className="action-button copy-button" onClick={handleCopy}>
+            📄 複製題目
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${GRID_SIZE}, 32px)`, gap: 2 }}>
+        
+        <div className="sudoku-grid">
           {(solution || board).map((row, i) =>
             row.map((_, j) => {
               const isOriginal = board[i][j] !== 0
               const showValue = solution ? solution[i][j] : board[i][j]
               const isHighlighted = selectedNumber !== null && showValue === selectedNumber && !isOriginal
+              const isInvalid = !solution && board[i][j] !== 0 && !isCellValid(board, i, j)
+
+              // 計算邊框粗細
+              const borderTop = i === 0 ? '2px solid #222' : (i % 3 === 0 ? '2px solid #222' : '1px solid #bbb')
+              const borderLeft = j === 0 ? '2px solid #222' : (j % 3 === 0 ? '2px solid #222' : '1px solid #bbb')
+              const borderRight = j === 8 ? '2px solid #222' : 'none'
+              const borderBottom = i === 8 ? '2px solid #222' : 'none'
+
               return (
                 <input
                   key={`${i}-${j}`}
@@ -278,20 +501,12 @@ function App() {
                   onChange={e => handleInput(i, j, e.target.value)}
                   onKeyDown={e => handleKeyDown(i, j, e)}
                   disabled={!!solution}
+                  className={`sudoku-cell ${isOriginal ? 'original' : ''} ${isHighlighted ? 'highlighted' : ''} ${solution && !isOriginal ? 'solution' : ''} ${isInvalid ? 'invalid' : ''}`}
                   style={{
-                    width: 32,
-                    height: 32,
-                    textAlign: 'center',
-                    fontSize: 20,
-                    border: '1px solid #aaa',
-                    borderRight: (j + 1) % 3 === 0 ? '3px solid #333' : '1px solid #aaa',
-                    borderBottom: (i + 1) % 3 === 0 ? '3px solid #333' : '1px solid #aaa',
-                    borderLeft: j % 3 === 0 ? '3px solid #333' : '1px solid #aaa',
-                    borderTop: i % 3 === 0 ? '3px solid #333' : '1px solid #aaa',
-                    outline: 'none',
-                    color: isHighlighted ? 'red' : (solution ? (isOriginal ? 'black' : 'blue') : 'black'),
-                    background: isHighlighted ? '#ffe6e6' : (solution && !isOriginal ? '#eaf4ff' : 'white'),
-                    fontWeight: isHighlighted ? 'bold' : (isOriginal ? 'bold' : 'normal'),
+                    borderTop,
+                    borderLeft,
+                    borderRight,
+                    borderBottom,
                   }}
                 />
               )
@@ -299,79 +514,49 @@ function App() {
           )}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 16, marginTop: 24 }}>
-        <button style={{ fontSize: 18 }} onClick={handleSolve} disabled={!!solution}>
-          解答
-        </button>
-        <button 
-          style={{ 
-            fontSize: 18, 
-            backgroundColor: '#ff9800', 
-            color: 'white', 
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }} 
-          onClick={handleNewGame}
-        >
-          新一局
-        </button>
+
+      {/* 控制按鈕區域 */}
+      <div className="control-section">
+        <div className="main-buttons">
+          <div className="solve-button-wrapper">
+            <button 
+              className="solve-button" 
+              onClick={handleSolve} 
+              disabled={!!solution || isBoardEmpty || !isValidSudoku(board)}
+              data-tooltip={!solution && !isBoardEmpty && !isValidSudoku(board) ? getSudokuValidationError(board) || '' : ''}
+            >
+              🎯 解答
+            </button>
+          </div>
+          <button className="new-game-button" onClick={handleNewGame}>
+            🎮 新一局
+          </button>
+        </div>
       </div>
+
+      {/* 數字選擇器（僅在解答模式下顯示） */}
       {solution && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 16, alignItems: 'center' }}>
+        <div className="number-selector">
           <button
+            className="arrow-button"
             onClick={() => handleArrowClick('left')}
-            style={{
-              fontSize: 20,
-              color: '#666',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: '4px',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f0f0'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            ←
+            ⬅️
           </button>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
             <button
               key={num}
               onClick={() => handleNumberClick(num)}
-              style={{
-                width: 40,
-                height: 40,
-                fontSize: 18,
-                border: '2px solid #ccc',
-                borderRadius: '50%',
-                background: selectedNumber === num ? '#ff6b6b' : '#f0f0f0',
-                color: selectedNumber === num ? 'white' : 'black',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              className={`number-button ${selectedNumber === num ? 'selected' : ''}`}
             >
               {num}
             </button>
           ))}
           <button
+            className="arrow-button"
             onClick={() => handleArrowClick('right')}
-            style={{
-              fontSize: 20,
-              color: '#666',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: '4px',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f0f0'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            →
+            ➡️
           </button>
         </div>
       )}

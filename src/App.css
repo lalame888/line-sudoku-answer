@@ -1,3 +1,20 @@
+/* 全域樣式 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+  user-select: none;
+}
+*:hover, *:focus, *:active {
+  outline-style: none;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,6 +22,392 @@
   text-align: center;
 }
 
+/* 主容器 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 70vh;
+  height: auto;
+}
+
+/* 標題區域 */
+.title-section {
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+
+.main-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title-icon {
+  display: inline-block;
+  animation: bounce 2s infinite;
+  margin: 0 0.5rem;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  background-clip: initial !important;
+  color: initial !important;
+  filter: none !important;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0 0 0.2rem 0;
+  font-style: italic;
+}
+
+.subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+}
+
+/* 遊戲容器 */
+.game-container {
+  position: relative;
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 3px solid #f0f0f0;
+}
+
+/* 按鈕群組 */
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.action-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.paste-button {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+}
+
+.paste-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.copy-button {
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  color: white;
+}
+
+.copy-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+/* 數獨網格 */
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 40px);
+  gap: 0;
+  background: #333;
+  padding: 3px;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.sudoku-cell {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  outline: none;
+  background: white;
+  color: #333;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.sudoku-cell:focus {
+  background: #e3f2fd;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+}
+
+.sudoku-cell.original {
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.sudoku-cell.solution {
+  background: #e8f5e8;
+  color: #27ae60;
+}
+
+.sudoku-cell.highlighted {
+  background: #ffebee;
+  color: #e74c3c;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
+
+.sudoku-cell.invalid {
+  background: #ffebee;
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.sudoku-cell:disabled {
+  cursor: default;
+}
+
+/* 控制區域 */
+.control-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.main-buttons {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.solve-button, .new-game-button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.solve-button {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  color: white;
+}
+
+.solve-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.solve-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.solve-button-wrapper {
+  position: relative;
+}
+
+.solve-button:disabled:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.solve-button:disabled:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #333;
+  margin-bottom: 2px;
+  z-index: 1000;
+}
+
+.new-game-button {
+  background: linear-gradient(45deg, #feca57, #ff9ff3);
+  color: white;
+}
+
+.new-game-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(254, 202, 87, 0.4);
+}
+
+/* 數字選擇器 */
+.number-selector {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.arrow-button {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.arrow-button:hover {
+  background: #f0f0f0;
+  transform: scale(1.1);
+}
+
+.number-button {
+  width: 45px;
+  height: 45px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 3px solid #e0e0e0;
+  border-radius: 50%;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.number-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  border-color: #e74c3c;
+}
+
+.number-button.selected {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  color: white;
+  border-color: #ff6b6b;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* 動畫效果 */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .main-title {
+    font-size: 2rem;
+  }
+  
+  .sudoku-grid {
+    grid-template-columns: repeat(9, 35px);
+  }
+  
+  .sudoku-cell {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .number-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .main-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* 保留原有的 logo 相關樣式 */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -39,4 +442,196 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Modal 樣式 */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 2rem 1.5rem 1.2rem 1.5rem;
+  min-width: 260px;
+  max-width: 90vw;
+  text-align: center;
+  animation: modal-pop 0.2s cubic-bezier(.4,1.4,.6,1) both;
+}
+
+@keyframes modal-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: bold;
+  margin-bottom: 1.2rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.modal-cancel, .modal-confirm {
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modal-cancel {
+  background: #eee;
+  color: #666;
+}
+.modal-cancel:hover {
+  background: #ddd;
+}
+
+.modal-confirm {
+  background: #7c3aed;
+  color: #fff;
+}
+.modal-confirm:hover {
+  background: #5b21b6;
+}
+
+button:focus,
+button:active,
+button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.modal-pre {
+  background: #f6f6fa;
+  color: #333;
+  font-family: 'Menlo', 'Consolas', 'monospace';
+  font-size: 1rem;
+  padding: 0.7em 1em;
+  border-radius: 8px;
+  margin: 0.7em 0 1em 0;
+  text-align: left;
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.5;
+  user-select: text;
+}
+
+.help-btn {
+  position: fixed;
+  top: 12px;
+  right: 20px;
+  z-index: 1200;
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5em 1.2em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+@media (max-width: 600px) {
+  .help-btn {
+    top: 8px;
+    right: 8px;
+    font-size: 0.98rem;
+    padding: 0.45em 1em;
+  }
+}
+
+.help-btn:hover {
+  background: #5b21b6;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.15);
+}
+
+.modal-help-content {
+  margin-bottom: 1.2em;
+  font-size: 1rem;
+  color: #333;
+}
+
+.help-btn-inline-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.help-btn-inline {
+  background: #ece9f7;
+  color: #7c3aed;
+  border: none;
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: none;
+  margin-left: 0.2em;
+  opacity: 0.7;
+  position: relative;
+  padding: 0;
+  line-height: 1;
+}
+.help-btn-inline:hover {
+  background: #7c3aed;
+  color: #fff;
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.10);
+}
+
+.help-btn-i {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 1.15em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.help-tooltip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: -2.2em;
+  transform: translateX(-50%);
+  background: #7c3aed;
+  color: #fff;
+  font-size: 0.95em;
+  padding: 0.35em 0.9em;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.13);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s;
+}
+.help-btn-inline:hover .help-tooltip,
+.help-btn-inline:focus .help-tooltip {
+  display: block;
+  opacity: 1;
 }
