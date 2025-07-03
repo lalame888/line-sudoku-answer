@@ -5,9 +5,9 @@
 ## 🎯 專案目的
 
 這個程式是起初是為《[LINE數獨達人](https://play.google.com/store/apps/details?id=com.linecorp.LGSNPTW&hl=zh_TW)》遊戲設計的快速破關工具。
-無廣告、無索取任何收益，程式碼開源供所有人使用
-包含Readme在內，幾乎由Cursor AI 以 Vibe coding的方式生成
-如果喜歡這個程式，可以在 github 專案頁面給予星星(Start)，我會很開心
+無廣告、無索取任何收益，程式碼開源供所有人使用。
+包含Readme在內，幾乎由Cursor AI 以 Vibe coding的方式生成。
+如果喜歡這個程式，可以在 [github 專案頁面](https://github.com/lalame888/line-sudoku-answer)給予星星(Start)，我會很開心！
 
 ### 為什麼需要這個工具？
 
