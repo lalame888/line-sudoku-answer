@@ -398,169 +398,194 @@ function App() {
   const isBoardEmpty = board.every(row => row.every(cell => cell === 0))
 
   return (
-    <div className="app-container">
-      {/* 使用說明 Modal */}
-      {helpModal && (
-        <div className="modal-backdrop" onClick={() => setHelpModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">使用說明</div>
-            <div className="modal-help-content">
-              <ol style={{textAlign: 'left', margin: 0, paddingLeft: '1.2em'}}>
-                <li>在 9x9 數獨格子中輸入題目（可用鍵盤或貼上）。</li>
-                <li>可點擊「貼上題目」快速貼入剪貼簿內容。</li>
-                <li>在任意格子按 Ctrl+V (Windows) 或 Cmd+V (Mac) 可從該格子開始貼上數字。</li>
-                <li>輸入完畢後，點擊「解答」即可獲得答案。</li>
-                <li>點擊「複製題目」可將目前題目複製到剪貼簿。</li>
-                <li>點擊「新一局」可清空所有內容（會再次確認）。</li>
-                <li>解答模式下可點選下方數字高亮顯示。</li>
-              </ol>
+    <>
+      <div className="app-container">
+        {/* 使用說明 Modal */}
+        {helpModal && (
+          <div className="modal-backdrop" onClick={() => setHelpModal(false)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-title">使用說明</div>
+              <div className="modal-help-content">
+                <ol style={{textAlign: 'left', margin: 0, paddingLeft: '1.2em'}}>
+                  <li>在 9x9 數獨格子中輸入題目（可用鍵盤或貼上）。</li>
+                  <li>可點擊「貼上題目」快速貼入剪貼簿內容。</li>
+                  <li>在任意格子按 Ctrl+V (Windows) 或 Cmd+V (Mac) 可從該格子開始貼上數字。</li>
+                  <li>輸入完畢後，點擊「解答」即可獲得答案。</li>
+                  <li>點擊「複製題目」可將目前題目複製到剪貼簿。</li>
+                  <li>點擊「新一局」可清空所有內容（會再次確認）。</li>
+                  <li>解答模式下可點選下方數字高亮顯示。</li>
+                </ol>
+              </div>
+              <div className="modal-actions">
+                <button className="modal-confirm" onClick={() => setHelpModal(false)}>關閉</button>
+              </div>
             </div>
-            <div className="modal-actions">
-              <button className="modal-confirm" onClick={() => setHelpModal(false)}>關閉</button>
+          </div>
+        )}
+        {/* 訊息 Modal */}
+        {messageModal.open && (
+          <div className="modal-backdrop" onClick={closeMessage}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-title">{messageModal.message}</div>
+              {messageModal.content && (
+                <pre className="modal-pre">{messageModal.content}</pre>
+              )}
+              <div className="modal-actions">
+                <button className="modal-confirm" onClick={closeMessage}>關閉</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Modal 視窗 */}
+        {showModal && (
+          <div className="modal-backdrop" onClick={cancelNewGame}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-title">確定要清空所有題目內容嗎？</div>
+              <div className="modal-actions">
+                <button className="modal-cancel" onClick={cancelNewGame}>取消</button>
+                <button className="modal-confirm" onClick={confirmNewGame}>確認</button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* 標題區域 */}
+        <div className="title-section">
+          <h1 className="main-title">
+            <span className="title-icon">🧩</span>
+            數獨解答神器
+            <span className="title-icon">✨</span>
+          </h1>
+          <div className="subtitle-row">
+            <p className="subtitle">輸入數獨題目，一鍵獲得解答！</p>
+            <div className="help-btn-inline-wrapper">
+              <button className="help-btn-inline" onClick={() => setHelpModal(true)} aria-label="使用說明">
+                ⓘ
+                <span className="help-tooltip">使用說明</span>
+              </button>
             </div>
           </div>
         </div>
-      )}
-      {/* 訊息 Modal */}
-      {messageModal.open && (
-        <div className="modal-backdrop" onClick={closeMessage}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">{messageModal.message}</div>
-            {messageModal.content && (
-              <pre className="modal-pre">{messageModal.content}</pre>
+
+        {/* 主要遊戲區域 */}
+        <div className="game-container">
+          <div className="button-group">
+            <button className="action-button paste-button" onClick={handlePaste}>
+              📋 貼上題目
+            </button>
+            <button className="action-button copy-button" onClick={handleCopy}>
+              📄 複製題目
+            </button>
+          </div>
+          
+          <div className="sudoku-grid">
+            {(solution || board).map((row, i) =>
+              row.map((_, j) => {
+                const isOriginal = board[i][j] !== 0
+                const showValue = solution ? solution[i][j] : board[i][j]
+                const isHighlighted = selectedNumber !== null && showValue === selectedNumber && !isOriginal
+                const isInvalid = !solution && board[i][j] !== 0 && !isCellValid(board, i, j)
+
+                // 計算邊框粗細
+                const borderTop = i === 0 ? '2px solid #222' : (i % 3 === 0 ? '2px solid #222' : '1px solid #bbb')
+                const borderLeft = j === 0 ? '2px solid #222' : (j % 3 === 0 ? '2px solid #222' : '1px solid #bbb')
+                const borderRight = j === 8 ? '2px solid #222' : 'none'
+                const borderBottom = i === 8 ? '2px solid #222' : 'none'
+
+                return (
+                  <input
+                    key={`${i}-${j}`}
+                    ref={el => { inputRefs.current[i][j] = el; return undefined }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={showValue === 0 ? '' : String(showValue)}
+                    onChange={e => handleInput(i, j, e.target.value)}
+                    onKeyDown={e => handleKeyDown(i, j, e)}
+                    disabled={!!solution}
+                    className={`sudoku-cell ${isOriginal ? 'original' : ''} ${isHighlighted ? 'highlighted' : ''} ${solution && !isOriginal ? 'solution' : ''} ${isInvalid ? 'invalid' : ''}`}
+                    style={{
+                      borderTop,
+                      borderLeft,
+                      borderRight,
+                      borderBottom,
+                    }}
+                  />
+                )
+              })
             )}
-            <div className="modal-actions">
-              <button className="modal-confirm" onClick={closeMessage}>關閉</button>
-            </div>
           </div>
         </div>
-      )}
-      {/* Modal 視窗 */}
-      {showModal && (
-        <div className="modal-backdrop" onClick={cancelNewGame}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">確定要清空所有題目內容嗎？</div>
-            <div className="modal-actions">
-              <button className="modal-cancel" onClick={cancelNewGame}>取消</button>
-              <button className="modal-confirm" onClick={confirmNewGame}>確認</button>
+
+        {/* 控制按鈕區域 */}
+        <div className="control-section">
+          <div className="main-buttons">
+            <div className="solve-button-wrapper">
+              <button 
+                className="solve-button" 
+                onClick={handleSolve} 
+                disabled={!!solution || isBoardEmpty || !isValidSudoku(board)}
+                data-tooltip={!solution && !isBoardEmpty && !isValidSudoku(board) ? getSudokuValidationError(board) || '' : ''}
+              >
+                🎯 解答
+              </button>
             </div>
-          </div>
-        </div>
-      )}
-      {/* 標題區域 */}
-      <div className="title-section">
-        <h1 className="main-title">
-          <span className="title-icon">🧩</span>
-          數獨解答神器
-          <span className="title-icon">✨</span>
-        </h1>
-        <div className="subtitle-row">
-          <p className="subtitle">輸入數獨題目，一鍵獲得解答！</p>
-          <div className="help-btn-inline-wrapper">
-            <button className="help-btn-inline" onClick={() => setHelpModal(true)} aria-label="使用說明">
-              ⓘ
-              <span className="help-tooltip">使用說明</span>
+            <button className="new-game-button" onClick={handleNewGame}>
+              🎮 新一局
             </button>
           </div>
         </div>
-      </div>
 
-      {/* 主要遊戲區域 */}
-      <div className="game-container">
-        <div className="button-group">
-          <button className="action-button paste-button" onClick={handlePaste}>
-            📋 貼上題目
-          </button>
-          <button className="action-button copy-button" onClick={handleCopy}>
-            📄 複製題目
-          </button>
-        </div>
-        
-        <div className="sudoku-grid">
-          {(solution || board).map((row, i) =>
-            row.map((_, j) => {
-              const isOriginal = board[i][j] !== 0
-              const showValue = solution ? solution[i][j] : board[i][j]
-              const isHighlighted = selectedNumber !== null && showValue === selectedNumber && !isOriginal
-              const isInvalid = !solution && board[i][j] !== 0 && !isCellValid(board, i, j)
-
-              // 計算邊框粗細
-              const borderTop = i === 0 ? '2px solid #222' : (i % 3 === 0 ? '2px solid #222' : '1px solid #bbb')
-              const borderLeft = j === 0 ? '2px solid #222' : (j % 3 === 0 ? '2px solid #222' : '1px solid #bbb')
-              const borderRight = j === 8 ? '2px solid #222' : 'none'
-              const borderBottom = i === 8 ? '2px solid #222' : 'none'
-
-              return (
-                <input
-                  key={`${i}-${j}`}
-                  ref={el => { inputRefs.current[i][j] = el; return undefined }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={showValue === 0 ? '' : String(showValue)}
-                  onChange={e => handleInput(i, j, e.target.value)}
-                  onKeyDown={e => handleKeyDown(i, j, e)}
-                  disabled={!!solution}
-                  className={`sudoku-cell ${isOriginal ? 'original' : ''} ${isHighlighted ? 'highlighted' : ''} ${solution && !isOriginal ? 'solution' : ''} ${isInvalid ? 'invalid' : ''}`}
-                  style={{
-                    borderTop,
-                    borderLeft,
-                    borderRight,
-                    borderBottom,
-                  }}
-                />
-              )
-            })
-          )}
-        </div>
-      </div>
-
-      {/* 控制按鈕區域 */}
-      <div className="control-section">
-        <div className="main-buttons">
-          <div className="solve-button-wrapper">
-            <button 
-              className="solve-button" 
-              onClick={handleSolve} 
-              disabled={!!solution || isBoardEmpty || !isValidSudoku(board)}
-              data-tooltip={!solution && !isBoardEmpty && !isValidSudoku(board) ? getSudokuValidationError(board) || '' : ''}
-            >
-              🎯 解答
-            </button>
-          </div>
-          <button className="new-game-button" onClick={handleNewGame}>
-            🎮 新一局
-          </button>
-        </div>
-      </div>
-
-      {/* 數字選擇器（僅在解答模式下顯示） */}
-      {solution && (
-        <div className="number-selector">
-          <button
-            className="arrow-button"
-            onClick={() => handleArrowClick('left')}
-          >
-            ⬅️
-          </button>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+        {/* 數字選擇器（僅在解答模式下顯示） */}
+        {solution && (
+          <div className="number-selector">
             <button
-              key={num}
-              onClick={() => handleNumberClick(num)}
-              className={`number-button ${selectedNumber === num ? 'selected' : ''}`}
+              className="arrow-button"
+              onClick={() => handleArrowClick('left')}
             >
-              {num}
+              ⬅️
             </button>
-          ))}
-          <button
-            className="arrow-button"
-            onClick={() => handleArrowClick('right')}
-          >
-            ➡️
-          </button>
-        </div>
-      )}
-    </div>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+              <button
+                key={num}
+                onClick={() => handleNumberClick(num)}
+                className={`number-button ${selectedNumber === num ? 'selected' : ''}`}
+              >
+                {num}
+              </button>
+            ))}
+            <button
+              className="arrow-button"
+              onClick={() => handleArrowClick('right')}
+            >
+              ➡️
+            </button>
+          </div>
+        )}
+      </div>
+      {/* 作者資訊 */}
+      <div className="author-info">
+        Made with by <span className="author-name">lalame888</span>
+        <a 
+          href="https://github.com/lalame888/line-sudoku-answer" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="github-link"
+        >
+          <span className="github-icon" style={{display: 'inline-flex', verticalAlign: 'middle'}}>
+  <svg height="1em" viewBox="0 0 16 16" fill="currentColor" width="1em" style={{marginRight: '0.2em'}}>
+    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+    0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52
+    -.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2
+    -3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82
+    .64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08
+    2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01
+    1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+  </svg>
+</span>
+          GitHub
+        </a>
+      </div>
+    </>
   )
 }
 
