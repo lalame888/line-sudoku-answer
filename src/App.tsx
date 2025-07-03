@@ -263,7 +263,7 @@ function App() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${GRID_SIZE}, 32px)`, gap: 2 }}>
           {(solution || board).map((row, i) =>
-            row.map((cell, j) => {
+            row.map((_, j) => {
               const isOriginal = board[i][j] !== 0
               const showValue = solution ? solution[i][j] : board[i][j]
               const isHighlighted = selectedNumber !== null && showValue === selectedNumber && !isOriginal

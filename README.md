@@ -1,3 +1,50 @@
+# Line Sudoku Answer
+
+一個數獨解答工具，使用 React + TypeScript + Vite 建構。
+
+## 功能特色
+
+- 數獨遊戲解答
+- 現代化的 React 介面
+- TypeScript 支援
+- 響應式設計
+
+## 本地開發
+
+```bash
+# 安裝依賴
+npm install
+
+# 啟動開發伺服器
+npm run dev
+
+# 建構生產版本
+npm run build
+
+# 預覽生產版本
+npm run preview
+```
+
+## 部署
+
+本專案已設定自動部署到 GitHub Pages。每次推送到 `main` 分支時，GitHub Actions 會自動建構並部署到 GitHub Pages。
+
+### 訪問網址
+
+部署完成後，您可以在以下網址訪問：
+`https://[您的GitHub用戶名].github.io/line-sudoku-answer/`
+
+## 技術棧
+
+- React 19
+- TypeScript
+- Vite
+- ESLint
+
+## 授權
+
+MIT License
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
