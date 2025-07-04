@@ -18,7 +18,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
     >
       <div className="modal-help-content">
         <ol style={{textAlign: 'left', margin: 0, paddingLeft: '1.2em'}}>
-          <li>在 9x9 數獨格子中輸入題目。</li>
+          <li>在 9x9 數獨格子中輸入題目，可用0 代表空格，以及使用方向鍵移動焦點。</li>
           <li>可點擊「貼上題目」快速貼入剪貼簿內容。</li>
           <li>在任意格子按 Ctrl+V (Windows) 或 Cmd+V (Mac) 可從該格子開始貼上數字。</li>
           <li>輸入完畢後，點擊「解答」即可獲得答案。</li>
