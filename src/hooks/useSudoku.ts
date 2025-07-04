@@ -30,7 +30,6 @@ export const useSudoku = () => {
 
   // 處理輸入
   const handleInput = (row: number, col: number, value: string) => {
-    console.log(value)
     let num = 0
     if (value !== '') {
       // 支援全型數字轉換

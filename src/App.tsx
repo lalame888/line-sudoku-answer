@@ -1,4 +1,3 @@
-import React from 'react'
 import './App.css'
 import { useSudoku } from './hooks/useSudoku'
 import TitleSection from './components/TitleSection'
