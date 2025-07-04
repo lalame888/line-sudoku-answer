@@ -81,25 +81,29 @@ export const useSudoku = () => {
 
   // 處理鍵盤（允許 Backspace 跳回上一格）
   const handleKeyDown = (row: number, col: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    // 方向鍵切換 focus 格子
-    if (e.key === 'ArrowUp' && row > 0) {
+    // 方向鍵切換 focus 格子（支援循環穿越）
+    if (e.key === 'ArrowUp') {
       e.preventDefault()
-      inputRefs.current[row - 1][col]?.focus()
+      const newRow = row > 0 ? row - 1 : GRID_SIZE - 1
+      inputRefs.current[newRow][col]?.focus()
       return
     }
-    if (e.key === 'ArrowDown' && row < GRID_SIZE - 1) {
+    if (e.key === 'ArrowDown') {
       e.preventDefault()
-      inputRefs.current[row + 1][col]?.focus()
+      const newRow = row < GRID_SIZE - 1 ? row + 1 : 0
+      inputRefs.current[newRow][col]?.focus()
       return
     }
-    if (e.key === 'ArrowLeft' && col > 0) {
+    if (e.key === 'ArrowLeft') {
       e.preventDefault()
-      inputRefs.current[row][col - 1]?.focus()
+      const newCol = col > 0 ? col - 1 : GRID_SIZE - 1
+      inputRefs.current[row][newCol]?.focus()
       return
     }
-    if (e.key === 'ArrowRight' && col < GRID_SIZE - 1) {
+    if (e.key === 'ArrowRight') {
       e.preventDefault()
-      inputRefs.current[row][col + 1]?.focus()
+      const newCol = col < GRID_SIZE - 1 ? col + 1 : 0
+      inputRefs.current[row][newCol]?.focus()
       return
     }
     
@@ -176,7 +180,7 @@ export const useSudoku = () => {
     }
     
     setSolution(ans)
-    setSelectedNumber(null) // 重置選中的數字
+    setSelectedNumber(1) // 預設選擇數字 1
   }
 
   // 處理數字按鈕點選
@@ -186,14 +190,19 @@ export const useSudoku = () => {
 
   // 處理箭頭點擊
   const handleArrowClick = (direction: 'left' | 'right') => {
-    if (selectedNumber !== null) {
-      if (direction === 'left') {
-        const prevNum = selectedNumber > 1 ? selectedNumber - 1 : 9
-        setSelectedNumber(prevNum)
-      } else {
-        const nextNum = selectedNumber < 9 ? selectedNumber + 1 : 1
-        setSelectedNumber(nextNum)
-      }
+    // 如果沒有選擇任何數字，預設選擇 1
+    if (selectedNumber === null) {
+      setSelectedNumber(1)
+      return
+    }
+    const currentNumber = selectedNumber;
+    
+    if (direction === 'left') {
+      const prevNum = currentNumber > 1 ? currentNumber - 1 : 9
+      setSelectedNumber(prevNum)
+    } else {
+      const nextNum = currentNumber < 9 ? currentNumber + 1 : 1
+      setSelectedNumber(nextNum)
     }
   }
 
@@ -282,11 +291,15 @@ export const useSudoku = () => {
       if (solution && selectedNumber !== null) {
         if (e.key === 'ArrowLeft') {
           e.preventDefault()
-          const prevNum = selectedNumber > 1 ? selectedNumber - 1 : 9
+          // 如果沒有選擇任何數字，預設選擇 1
+          const currentNumber = selectedNumber !== null ? selectedNumber : 1
+          const prevNum = currentNumber > 1 ? currentNumber - 1 : 9
           setSelectedNumber(prevNum)
         } else if (e.key === 'ArrowRight') {
           e.preventDefault()
-          const nextNum = selectedNumber < 9 ? selectedNumber + 1 : 1
+          // 如果沒有選擇任何數字，預設選擇 1
+          const currentNumber = selectedNumber !== null ? selectedNumber : 1
+          const nextNum = currentNumber < 9 ? currentNumber + 1 : 1
           setSelectedNumber(nextNum)
         }
       }
