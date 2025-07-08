@@ -1602,6 +1602,7 @@ button {
   position: relative;
   overflow: hidden;
   height: 60px;
+  display: none;
 }
 
 .main-nav::before {
