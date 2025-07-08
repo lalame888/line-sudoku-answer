@@ -155,6 +155,7 @@ body {
   gap: 1px;
   padding: 2px;
   box-sizing: border-box;
+  justify-content: center;
 }
 
 .sudoku-cell {
