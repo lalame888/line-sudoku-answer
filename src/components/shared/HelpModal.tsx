@@ -24,7 +24,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li>輸入完畢後，點擊「解答」即可獲得答案。</li>
           <li>點擊「複製題目」可將目前題目複製到剪貼簿。</li>
           <li>點擊「新一局」可清空所有內容。</li>
-          <li>解答模式下可點選下方數字高亮顯示。</li>
+          <li>解答模式下可點選下方數字高亮顯示，並可以使用方向鍵左右切換數字。</li>
         </ol>
       </div>
     </Modal>
