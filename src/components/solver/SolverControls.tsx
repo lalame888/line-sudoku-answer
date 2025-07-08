@@ -1,6 +1,6 @@
 import React from 'react'
 
-interface GameControlsProps {
+interface SolverControlsProps {
   onSolve: () => void
   onNewGame: () => void
   solution: number[][] | null
@@ -9,7 +9,7 @@ interface GameControlsProps {
   getSudokuValidationError: () => string | null
 }
 
-const GameControls: React.FC<GameControlsProps> = ({
+const SolverControls: React.FC<SolverControlsProps> = ({
   onSolve,
   onNewGame,
   solution,
@@ -38,4 +38,4 @@ const GameControls: React.FC<GameControlsProps> = ({
   )
 }
 
-export default GameControls 
+export default SolverControls 
