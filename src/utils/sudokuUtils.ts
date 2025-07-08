@@ -1,4 +1,4 @@
-const GRID_SIZE = 9
+export const GRID_SIZE = 9
 
 // 檢查數獨題目是否合法並返回錯誤訊息
 export function getSudokuValidationError(board: number[][]): string | null {
@@ -134,16 +134,18 @@ export function isBoardEmpty(board: number[][]): boolean {
   return board.every(row => row.every(cell => cell === 0))
 }
 
-export { GRID_SIZE } 
+ 
 
 // 數獨難度等級定義
-export enum Difficulty {
-  EASY = 'easy',
-  MEDIUM = 'medium', 
-  HARD = 'hard',
-  EXPERT = 'expert',
-  MASTER = 'master'
-}
+export const Difficulty = {
+  EASY: 'easy',
+  MEDIUM: 'medium', 
+  HARD: 'hard',
+  EXPERT: 'expert',
+  MASTER: 'master'
+} as const
+
+export type Difficulty = typeof Difficulty[keyof typeof Difficulty]
 
 // 各難度對應的挖空數量範圍
 const DIFFICULTY_HOLES = {

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { NoteCell } from '../hooks/useSudokuGame'
+import type { NoteCell } from '../../hooks/useSudokuGame'
 
 interface GameSudokuGridProps {
   board: number[][]
@@ -105,7 +105,7 @@ const GameSudokuGrid: React.FC<GameSudokuGridProps> = ({
   return (
     <div className="sudoku-grid game-grid">
       {board.map((row, rowIndex) =>
-        row.map((cell, colIndex) => (
+        row.map((_, colIndex) => (
           <div
             key={`${rowIndex}-${colIndex}`}
             className={getCellClassName(rowIndex, colIndex)}
