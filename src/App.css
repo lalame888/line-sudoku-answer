@@ -93,7 +93,7 @@ body {
 .game-container {
   position: relative;
   background: white;
-  padding: 1.2rem 0.5rem;
+  padding: 2rem;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border: 3px solid #f0f0f0;
